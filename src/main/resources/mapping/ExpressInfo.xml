@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ExpressInfo" >
+  <insert id="saveLogs" parameterType="java.util.HashMap">
+    insert into EXPRESS_LOGS (RECEIVE_INFO) values (#{receiveInfo})
+  </insert>
+
+  <select id="queryConfig" resultType="java.util.HashMap">
+    select EXP_NAME as "name", EXP_CODE as "code"
+    from EXPRESS_CONFIG
+  </select>
+
+  <insert id="saveExpInfo" parameterType="com.manage.express.model.Traces">
+    insert into EXPRESS_NEW_INFO
+    (EXP_CODE, LOGISTIC, PUSH_TIME, EXP_NAME, TRACE)
+    values
+    (#{expCode}, #{logistic}, #{pushTime}, #{expName}, #{trace})
+  </insert>
+
+  <select id="queryExpInfo" parameterType="java.util.HashMap" resultType="com.manage.express.model.Traces">
+    select ROW_ID as "rowId", EXP_CODE as "expCode", LOGISTIC as "logistic", PUSH_TIME as "pushTime",
+      EXP_NAME as "expName", TRACE as "trace"
+    from EXPRESS_NEW_INFO
+    where LOGISTIC = #{logistic}
+  </select>
+
+  <update id="updateExpInfo" parameterType="com.manage.express.model.Traces">
+    update EXPRESS_NEW_INFO
+    set TRACE = #{trace}
+    where ROW_ID = #{rowId}
+  </update>
+
+  <select id="queryOrderExpressInfo" parameterType="java.util.HashMap" resultType="com.manage.express.model.OrderExpressInfo">
+    select ROW_ID as "rowId", ORDER_NO as "orderNo", LOGISTIC_CODE as "logisticCode", SHIPPER_CODE as "shipperCode",
+      STATUS as "status", UPDATE_TIME as "updateTime", SENDER_CODE as "senderCode"
+    from ORDER_EXPRESS_INFO
+    where ORDER_NO = #{orderNo} and LOGISTIC_CODE = #{logisticCode}
+  </select>
+
+  <insert id="insertOrderExpressInfo" parameterType="com.manage.express.model.OrderExpressInfo">
+    insert into ORDER_EXPRESS_INFO
+    (ORDER_NO, LOGISTIC_CODE, SHIPPER_CODE, SENDER_CODE, STATUS, UPDATE_TIME)
+    values
+    (#{orderNo}, #{logisticCode}, #{shipperCode}, #{senderCode}, #{status}, #{updateTime})
+  </insert>
+
+  <select id="queryUnSubscribe" resultType="com.manage.express.model.OrderExpressInfo">
+    select ROW_ID as "rowId", ORDER_NO as "orderNo", LOGISTIC_CODE as "logisticCode", SHIPPER_CODE as "shipperCode",
+      STATUS as "status", UPDATE_TIME as "updateTime", SENDER_CODE as "senderCode", b.EXP_NAME as "expName"
+    from ORDER_EXPRESS_INFO a, EXPRESS_CONFIG b
+    where a.SHIPPER_CODE = b.EXP_CODE and STATUS = 0
+  </select>
+
+  <update id="updateSubscribeStatus">
+    update ORDER_EXPRESS_INFO
+    set STATUS = #{status}
+    where ORDER_NO = #{orderCode} and LOGISTIC_CODE = #{logisticCode}
+  </update>
+
+  <select id="queryKdlParams" resultType="java.util.HashMap">
+    select flag as "flag", value as "value" from SYS_CONFIG
+    where flag in ('EBusinessId', 'AppKey','ReqURL')
+  </select>
+
+  <update id="updateOrderStatus">
+    update ORDER_INFO
+    set ORDER_STATUS = case when ORDER_STATUS = 2 then 3 when ORDER_STATUS >= 3 then ORDER_STATUS end,
+      LOGISTIC = #{logistic},
+      EXPRESS_CODE = #{expressCode},
+      EXPRESS_NAME = #{expressName},
+      DELIVERY_ID = #{deliveryId}
+    where ORDER_NO = #{orderNo} and ORDER_STATUS >= 2
+  </update>
+</mapper>

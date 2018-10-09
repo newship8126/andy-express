@@ -1,0 +1,60 @@
+server:
+  port: 8400
+  servlet:
+    context-path: /andy-express
+
+spring:
+  datasource:
+    name: test
+    url: jdbc:mysql://bj-cdb-847sajz7.sql.tencentcdb.com:63314/andy?useSSL=false
+#    url: jdbc:mysql://172.21.0.13:3986/andy?useSSL=false
+    username: root
+    password: andy@12345
+  druid:
+    test-while-idle: true
+    validation-query: select 1 from sysibm.sysdummy1
+    initial-size: 3
+    max-active: 50
+    min-idle: 3
+    max-wait: 10000
+    pool-prepared-statements: true
+    max-pool-prepared-statement-per-connection-size: 50
+    max-open-prepared-statements: 50
+    time-between-eviction-runs-millis: 90000
+    min-evictable-idle-time-millis: 450000
+  thymeleaf:
+    cache: false
+
+  devtools:
+    livereload:
+      enabled: true
+  jpa:
+    database: MYSQL
+    show-sql: true
+    #Hibernate ddl auto
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+      naming:
+        physical-strategy: com.manage.express.utils.ToUpperCaseStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+mybatis:
+  mapper-locations: classpath:mapping/*.xml
+  type-aliases-package: com.manage.express.**.model
+
+#pagehelper分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+logging:
+  pattern: "%d - %msg%n"
+  level:
+    com.imooc.LoggerTest: debug
+    com.newship.manage.mapper: debug
+    org.springframework.web: debug
+    org.springframework.transaction: debug
+    org.mybaties: debug

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="Sender" >
+  <select id="querySenders" parameterType="java.util.HashMap" resultType="com.manage.express.model.Addr">
+    select a.CONTACT as "name", a.PHONE as "mobile", b.NAME as "provinceName", c.NAME as "cityName",
+      d.NAME as "expAreaName", a.CUSTOM as "address"
+    from DELIVERY_INFO a
+      left join DELIVERY_DETAIL b on a.ROW_ID = b.DELIVERY_ID and b.LEVEL = 0
+      left join DELIVERY_DETAIL c on a.ROW_ID = c.DELIVERY_ID and c.LEVEL = 1
+      left join DELIVERY_DETAIL d on a.ROW_ID = d.DELIVERY_ID and d.LEVEL = 2
+    where a.ROW_ID = #{senderCode}
+  </select>
+  
+  <select id="queryReceive" parameterType="java.util.HashMap" resultType="com.manage.express.model.Addr">
+    select A.CONTACTS as "name", A.PHONE as "mobile", B.NAME as "provinceName",
+      C.NAME as "cityName", D.NAME as "expAreaName", A.ADDR_CUSTOM as "address"
+    from ORDER_INFO A
+      LEFT JOIN ADDR_DETAIL B ON A.ADDR_ID = B.ADDR_ID AND B.LEVEL = 0
+      LEFT JOIN ADDR_DETAIL C ON A.ADDR_ID = C.ADDR_ID AND C.LEVEL = 0
+      LEFT JOIN ADDR_DETAIL D ON A.ADDR_ID = D.ADDR_ID AND D.LEVEL = 0
+    where order_no = #{orderNo}
+  </select>
+</mapper>
