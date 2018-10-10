@@ -45,10 +45,10 @@
   </insert>
 
   <select id="queryUnSubscribe" resultType="com.manage.express.model.OrderExpressInfo">
-    select ROW_ID as "rowId", ORDER_NO as "orderNo", LOGISTIC_CODE as "logisticCode", SHIPPER_CODE as "shipperCode",
-      STATUS as "status", UPDATE_TIME as "updateTime", SENDER_CODE as "senderCode", b.EXP_NAME as "expName"
+    select a.ROW_ID as "rowId", a.ORDER_NO as "orderNo", a.LOGISTIC_CODE as "logisticCode", a.SHIPPER_CODE as "shipperCode",
+      a.STATUS as "status", a.UPDATE_TIME as "updateTime", a.SENDER_CODE as "senderCode", b.EXP_NAME as "expName"
     from ORDER_EXPRESS_INFO a, EXPRESS_CONFIG b
-    where a.SHIPPER_CODE = b.EXP_CODE and STATUS = 0
+    where a.SHIPPER_CODE = b.EXP_CODE and a.STATUS = 0
   </select>
 
   <update id="updateSubscribeStatus">
