@@ -117,7 +117,7 @@ public class FileUploadService {
     List<ImportData> importDataList =new ArrayList<ImportData>();
     ImportData importData;
 
-    String br = "<br/>";
+    String br = "\r\n";
 
     //循环Excel行数,从第二行开始。标题不入库
     for(int r=1;r<totalRows;r++){
@@ -207,7 +207,7 @@ public class FileUploadService {
       }
       errorMsg = "共" + importDataList.size()+"条数据, 导入" + n + "条记录. \r\n";
       if (errorData.length() > 0) {
-        errorMsg += "以下订单已被订阅:" + errorData.substring(0, errorData.length() - 1).toString();
+        errorMsg += "以下订单已被导入:" + errorData.substring(0, errorData.length() - 1).toString();
       }
     }
     return errorMsg;
