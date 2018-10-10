@@ -248,11 +248,11 @@ public class FileUploadService {
       params.put("status", 1);
       template.update("ExpressInfo.updateSubscribeStatus", params);
       Map<String, Object> orderParams = new HashMap<>();
-      params.put("orderNo", oei.getOrderNo());
-      params.put("logistic", oei.getLogisticCode());
-      params.put("expressCode", oei.getShipperCode());
-      params.put("expressName", oei.getExpName());
-      params.put("deliveryId", oei.getSenderCode());
+      orderParams.put("orderNo", oei.getOrderNo());
+      orderParams.put("logistic", oei.getLogisticCode());
+      orderParams.put("expressCode", oei.getShipperCode());
+      orderParams.put("expressName", oei.getExpName());
+      orderParams.put("deliveryId", oei.getSenderCode());
       template.update("ExpressInfo.updateOrderStatus", orderParams);
     }
 
