@@ -6,7 +6,7 @@
   </insert>
 
   <select id="queryConfig" resultType="java.util.HashMap">
-    select EXP_NAME as "name", EXP_CODE as "code"saveExpInfo
+    select EXP_NAME as "name", EXP_CODE as "code"
     from EXPRESS_CONFIG
   </select>
 
