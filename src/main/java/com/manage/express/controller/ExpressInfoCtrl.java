@@ -35,7 +35,7 @@ public class ExpressInfoCtrl {
 
   @ResponseBody
   @PostMapping("/receive-express-info")
-  public Map<String, Object> receiveExpressInfo(@RequestParam(value = "DataSign") String dataSign,
+  public Map<String, Object> receiveExpressInfo(@RequestParam(value = "DataSign", required = false) String dataSign,
                                                 @RequestParam(value = "RequestType") String requestType,
                                                 @RequestParam(value = "RequestData") String requestData) {
     Map<String, Object> result = new HashMap<>();

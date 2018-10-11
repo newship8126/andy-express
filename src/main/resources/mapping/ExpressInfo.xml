@@ -26,7 +26,7 @@
 
   <update id="updateExpInfo" parameterType="com.manage.express.model.Traces">
     update EXPRESS_NEW_INFO
-    set TRACE = #{trace}
+    set PUSH_TIME = #{pushTime}, TRACE = #{trace}
     where ROW_ID = #{rowId}
   </update>
 

@@ -53,6 +53,7 @@ public class ExpressInfoService {
         traces.setTrace(tracesJson);
         template.insert("ExpressInfo.saveExpInfo", traces);
       } else {
+        traces.setPushTime(ei.getPushTime());
         traces.setTrace(tracesJson);
         template.update("ExpressInfo.updateExpInfo", traces);
       }
