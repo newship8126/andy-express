@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -35,34 +39,56 @@ public class ExpressInfoCtrl {
 
   @ResponseBody
   @PostMapping("/receive-express-info")
-  public Map<String, Object> receiveExpressInfo(@RequestParam(value = "DataSign", required = false) String dataSign,
-                                                @RequestParam(value = "RequestType") String requestType,
-                                                @RequestParam(value = "RequestData") String requestData) {
+  public Map<String, Object> receiveExpressInfo(HttpServletResponse response,
+                                                HttpServletRequest request) {
+    response.setCharacterEncoding("utf-8");
+    response.setContentType("text/html");
+
+    String inputLine;
+    String str = "";
+    try {
+      BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
+      while ((inputLine = br.readLine()) != null) {
+        str += inputLine;
+      }
+      br.close();
+    } catch (IOException e) {
+      System.out.println("IOException: " + e);
+    }
+    System.out.println("快递鸟推送服务BODY:" + str);
+
+    String requestType = request.getParameter("RequestType");
+    String requestData = request.getParameter("RequestData");
+
     Map<String, Object> result = new HashMap<>();
     result.put("UpdateTime", DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));
-    try {
-      String requestDataJson = URLDecoder.decode(requestData, "UTF-8");
-      expressInfoService.saveLogs(requestDataJson);
-      ObjectMapper objectMapper = new ObjectMapper();
-      ExpressInfo ei = objectMapper.readValue(requestDataJson, ExpressInfo.class);
-      result.put("EBusinessID", ei.geteBusinessId());
-      if (StringUtils.equals(requestType, TRACE_CODE)) {
-        executorService.execute(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              expressInfoService.saveExpressInfo(ei);
-            } catch (Exception ex) {
-              System.out.println("快递鸟推送信息处理异常" + ex);
+    if (StringUtils.equals(requestType, TRACE_CODE)) {
+      try {
+        String requestDataJson = URLDecoder.decode(requestData, "UTF-8");
+        expressInfoService.saveLogs(requestDataJson);
+        ObjectMapper objectMapper = new ObjectMapper();
+        ExpressInfo ei = objectMapper.readValue(requestDataJson, ExpressInfo.class);
+        result.put("EBusinessID", ei.geteBusinessId());
+          executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+              try {
+                expressInfoService.saveExpressInfo(ei);
+              } catch (Exception ex) {
+                System.out.println("快递鸟推送信息处理异常" + ex);
+              }
             }
-          }
-        });
+          });
+        result.put("Success", true);
+        result.put("Reason", "");
+      } catch (Exception e) {
+        System.out.println("快递鸟推送信息获取异常" + e);
+        result.put("Success", false);
+        result.put("Reason", "");
       }
+    } else {
+      System.out.println("跳过非物流信息推送");
       result.put("Success", true);
-      result.put("Reason", "");
-    } catch (Exception e) {
-      System.out.println("快递鸟推送信息获取异常" + e);
-      result.put("Success", false);
       result.put("Reason", "");
     }
     System.out.println(result);

@@ -51,7 +51,7 @@ public class FileUploadService {
    * @param mfile
    * @return
    */
-  @Transactional(rollbackFor = Exception.class)
+//  @Transactional(rollbackFor = Exception.class)
   public String batchImport(String fileName, MultipartFile mfile){
 
     File uploadDir = new  File("/tmp");
@@ -80,7 +80,8 @@ public class FileUploadService {
       return readExcelValue(wb,tempFile);
     }catch(Exception e){
       e.printStackTrace();
-      throw new RuntimeException("导入出错！请检查数据格式！" + e);
+      System.out.println("导入出错！请检查数据格式！" + e);
+      return e.getMessage();
     } finally{
       if(is !=null)
       {
@@ -139,12 +140,14 @@ public class FileUploadService {
         Cell cell = row.getCell(c);
         if (null != cell){
           if(c==0){
+            cell.setCellType(Cell.CELL_TYPE_STRING);
             orderNo = cell.getStringCellValue();
             if(StringUtils.isEmpty(orderNo)){
               rowMessage += "订单号不能为空；";
             }
             importData.setOrderNo(orderNo);
           }else if(c==1){
+            cell.setCellType(Cell.CELL_TYPE_STRING);
             shipperCode = cell.getStringCellValue();
             if(StringUtils.isEmpty(shipperCode)){
               rowMessage += "快递公司编码不能为空；";
@@ -153,12 +156,14 @@ public class FileUploadService {
             }
             importData.setShipperCode(shipperCode);
           }else if(c==2){
+            cell.setCellType(Cell.CELL_TYPE_STRING);
             logisticCode = cell.getStringCellValue();
             if(StringUtils.isEmpty(logisticCode)){
               rowMessage += "快递单号不能为空；";
             }
             importData.setLogisticCode(logisticCode);
           }else if (c==3) {
+            cell.setCellType(Cell.CELL_TYPE_STRING);
             senderCode = cell.getStringCellValue();
             if(StringUtils.isEmpty(senderCode)){
               rowMessage += "发货地编码不能为空；";
@@ -231,6 +236,7 @@ public class FileUploadService {
     KdniaoSubscribeAPI api = new KdniaoSubscribeAPI(eBusinessId, appKey, reqURL);
     List<OrderExpressInfo> list = template.selectList("ExpressInfo.queryUnSubscribe");
     for (OrderExpressInfo oei : list) {
+      System.out.println("开始处理订阅订单:"+oei.getOrderNo());
       RequestData rd = new RequestData();
       rd.setOrderCode(oei.getOrderNo());
       rd.setShipperCode(oei.getShipperCode());
