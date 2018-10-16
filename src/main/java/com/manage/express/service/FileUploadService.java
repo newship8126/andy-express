@@ -220,21 +220,13 @@ public class FileUploadService {
   }
 
   public void subscribeExpressInfo() throws Exception {
-    List<Map<String, String>> kdlParams = template.selectList("ExpressInfo.queryKdlParams");
-    String eBusinessId = "", appKey = "", reqURL = "";
-    for (Map<String, String> kdlparam : kdlParams) {
-      if (StringUtils.equals("EBusinessId", kdlparam.get("flag"))) {
-        eBusinessId = kdlparam.get("value");
-      }
-      if (StringUtils.equals("AppKey", kdlparam.get("flag"))) {
-        appKey = kdlparam.get("value");
-      }
-      if (StringUtils.equals("ReqURL", kdlparam.get("flag"))) {
-        reqURL = kdlparam.get("value");
-      }
-    }
-    KdniaoSubscribeAPI api = new KdniaoSubscribeAPI(eBusinessId, appKey, reqURL);
+    KdniaoSubscribeAPI api = getKdniaoSubscribeAPI();
     List<OrderExpressInfo> list = template.selectList("ExpressInfo.queryUnSubscribe");
+    initSubscribe(api, list);
+
+  }
+
+  private void initSubscribe(KdniaoSubscribeAPI api, List<OrderExpressInfo> list) throws Exception {
     for (OrderExpressInfo oei : list) {
       System.out.println("开始处理订阅订单:"+oei.getOrderNo());
       RequestData rd = new RequestData();
@@ -261,6 +253,29 @@ public class FileUploadService {
       orderParams.put("deliveryId", oei.getSenderCode());
       template.update("ExpressInfo.updateOrderStatus", orderParams);
     }
+  }
 
+  private KdniaoSubscribeAPI getKdniaoSubscribeAPI() {
+    List<Map<String, String>> kdlParams = template.selectList("ExpressInfo.queryKdlParams");
+    String eBusinessId = "", appKey = "", reqURL = "";
+    for (Map<String, String> kdlparam : kdlParams) {
+      if (StringUtils.equals("EBusinessId", kdlparam.get("flag"))) {
+        eBusinessId = kdlparam.get("value");
+      }
+      if (StringUtils.equals("AppKey", kdlparam.get("flag"))) {
+        appKey = kdlparam.get("value");
+      }
+      if (StringUtils.equals("ReqURL", kdlparam.get("flag"))) {
+        reqURL = kdlparam.get("value");
+      }
+    }
+    return new KdniaoSubscribeAPI(eBusinessId, appKey, reqURL);
+  }
+
+  public void subscribeOrderExpress(Map<String, Object> params) throws Exception {
+    KdniaoSubscribeAPI api = getKdniaoSubscribeAPI();
+    List<OrderExpressInfo> list = template.selectList("ExpressInfo.queryOrderExpress", params);
+    if (list.size() == 0) throw new RuntimeException("订单物流信息异常");
+    initSubscribe(api, list);
   }
 }

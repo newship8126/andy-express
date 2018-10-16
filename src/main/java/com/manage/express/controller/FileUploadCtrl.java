@@ -5,15 +5,15 @@ import com.manage.express.utils.ExcelImportUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/fileUpload")
@@ -75,6 +75,25 @@ public class FileUploadCtrl {
       session.setAttribute("msg","物流跟踪信息订阅失败");
     }
     return "fileupload/upload";
+  }
+
+  @ResponseBody
+  @PostMapping("/subscribe-order-express")
+  public Map<String, Object> subscribeOrderExpress(@RequestBody Map<String, Object> params) {
+    Map<String, Object> resultMap = new HashMap<>();
+    String orderNo = String.valueOf(params.get("orderNo"));
+    try {
+      fileUploadService.subscribeOrderExpress(params);
+      System.out.println("订单号:" + String.valueOf(params.get("orderNo")) + "订阅物流信息成功");
+      resultMap.put("status", 0);
+      resultMap.put("msg", "订单号:" + String.valueOf(params.get("orderNo")) + "订阅物流信息成功");
+    } catch (Exception e) {
+      System.out.println("订单号:" + String.valueOf(params.get("orderNo")) + "订阅物流信息失败");
+      e.printStackTrace();
+      resultMap.put("status", 1);
+      resultMap.put("msg", "订单号:" + String.valueOf(params.get("orderNo")) + "订阅物流信息失败");
+    }
+    return resultMap;
   }
 
 }
